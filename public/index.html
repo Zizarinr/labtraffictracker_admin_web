@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistem Pusat Monitoring & Inventaris Laboratorium</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- LAYAR LOGIN -->
+  <div id="login-screen" class="login-screen hidden">
+    <div class="login-container">
+      <div class="login-brand">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-kicker">SISTEM PUSAT LABORATORIUM</div>
+          <h1 class="brand-title">Monitoring Kunjungan & Inventaris</h1>
+        </div>
+      </div>
+
+      <form id="login-form" class="login-card" autocomplete="on">
+        <div class="login-card-header">
+          <h2>Masuk Administrator</h2>
+          <p>Gunakan kredensial pengelola laboratorium untuk mengakses konsol pusat.</p>
+        </div>
+
+        <div id="login-error" class="alert-banner alert-danger hidden"></div>
+
+        <div class="field-group">
+          <label for="login-email">Alamat Email</label>
+          <input id="login-email" name="email" type="email" required placeholder="admin@lab.kampus.ac.id" autocomplete="username" />
+        </div>
+
+        <div class="field-group">
+          <label for="login-password">Kata Sandi</label>
+          <input id="login-password" name="password" type="password" required placeholder="••••••••••••" autocomplete="current-password" />
+        </div>
+
+        <button type="submit" id="login-submit" class="btn btn-primary btn-block">
+          Masuk ke Konsol Pusat
+        </button>
+
+        <div class="login-footer-meta">
+          <span>Kontrak Ingest: <code>POST /api/lab/traffic</code></span>
+          <span>Zona Waktu: <code>Asia/Jakarta (+07:00)</code></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SHELL APLIKASI UTAMA -->
+  <div id="app-shell" class="app-shell hidden">
+    <!-- SIDEBAR NAVIGASI -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-mark brand-mark-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+        </div>
+        <div class="sidebar-brand-text">
+          <div class="sidebar-title">LAB CENTRAL</div>
+          <div class="sidebar-subtitle">Monitoring & Inventaris</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section-label">OPERASIONAL KUNJUNGAN</div>
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item active" data-view="dashboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+          </svg>
+          <span>Ringkasan & Status Lab</span>
+        </button>
+
+        <button type="button" class="nav-item" data-view="visits">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+            <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+            <path d="M9 12h6"></path>
+            <path d="M9 16h6"></path>
+          </svg>
+          <span>Data Kunjungan KTM</span>
+        </button>
+
+        <button type="button" class="nav-item" data-view="labs">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+            <path d="M8 21h8"></path>
+            <path d="M12 17v4"></path>
+          </svg>
+          <span>Laboratorium & Token</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section-label">MANAJEMEN ASET</div>
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item" data-view="inventory">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+            <path d="m3.3 7 8.7 5 8.7-5"></path>
+            <path d="M12 22V12"></path>
+          </svg>
+          <span>Inventaris Barang</span>
+        </button>
+
+        <button type="button" class="nav-item" data-view="import-audit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <polyline points="9 15 12 12 15 15"></polyline>
+          </svg>
+          <span>Impor Excel & Audit</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="ingest-endpoint-box">
+          <div class="ingest-endpoint-label">ENDPOINT SINKRONISASI KIOSK</div>
+          <code id="sidebar-ingest-url" class="ingest-endpoint-code">/api/lab/traffic</code>
+        </div>
+        <div class="user-profile-bar">
+          <div class="user-info">
+            <div id="current-user-name" class="user-name">Administrator</div>
+            <div id="current-user-email" class="user-email">admin@lab.kampus.ac.id</div>
+          </div>
+          <button type="button" id="logout-btn" class="btn-icon" title="Keluar Sesi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- AREA KERJA UTAMA -->
+    <div class="main-area">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 id="topbar-title" class="topbar-title">Ringkasan Operasional</h1>
+          <span id="topbar-subtitle" class="topbar-subtitle">Pemantauan penerimaan log multi-laboratorium & aset</span>
+        </div>
+        <div class="topbar-right">
+          <div class="server-clock-pill" title="Waktu Server Pusat (Asia/Jakarta)">
+            <span class="status-dot status-dot-online"></span>
+            <span id="server-clock-text" class="mono">WIB (+07:00)</span>
+          </div>
+          <button type="button" id="refresh-current-view" class="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>Muat Ulang</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- NOTIFIKASI TOAST GLOBAL -->
+      <div id="toast-container" class="toast-container"></div>
+
+      <!-- KONTEN MODUL -->
+      <main class="content-body">
+        <!-- ==================== VIEW 1: DASHBOARD ==================== -->
+        <section id="view-dashboard" class="view-section">
+          <!-- Filter Bar Dashboard -->
+          <div class="toolbar-panel">
+            <div class="toolbar-group">
+              <div class="field-inline">
+                <label for="dash-lab-filter">Laboratorium</label>
+                <select id="dash-lab-filter">
+                  <option value="">Semua Laboratorium</option>
+                </select>
+              </div>
+              <div class="field-inline">
+                <label for="dash-from-date">Dari Tanggal</label>
+                <input type="date" id="dash-from-date" />
+              </div>
+              <div class="field-inline">
+                <label for="dash-to-date">Sampai Tanggal</label>
+                <input type="date" id="dash-to-date" />
+              </div>
+              <button type="button" id="dash-apply-filter" class="btn btn-secondary btn-sm">Terapkan Rentang</button>
+            </div>
+            <div class="toolbar-actions">
+              <button type="button" class="btn btn-secondary btn-sm" data-goto-view="labs">+ Daftarkan Kiosk Lab</button>
+              <button type="button" class="btn btn-primary btn-sm" data-goto-view="visits">Telusuri Semua Kunjungan</button>
+            </div>
+          </div>
+
+          <!-- Peringatan Operasional Aktif -->
+          <div id="dash-alerts-container" class="alerts-stack hidden"></div>
+
+          <!-- 4 Kartu Metrik Utama -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">KUNJUNGAN HARI INI (<span id="kpi-today-date" class="mono">-</span>)</div>
+              <div id="kpi-today-total" class="kpi-value mono">0</div>
+              <div class="kpi-meta">
+                <span class="badge badge-success"><span id="kpi-today-ok" class="mono">0</span> Terdaftar</span>
+                <span class="badge badge-danger"><span id="kpi-today-notfound" class="mono">0</span> Tidak Dikenal</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">KUNJUNGAN RENTANG TERPILIH</div>
+              <div id="kpi-range-total" class="kpi-value mono">0</div>
+              <div class="kpi-meta">
+                <span>Mahasiswa Unik: <strong id="kpi-range-unique" class="mono">0</strong> NIM</span>
+                <span>Hari Ini: <strong id="kpi-today-unique" class="mono">0</strong> NIM</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">STATUS KIOSK LABORATORIUM</div>
+              <div class="kpi-value mono"><span id="kpi-labs-online">0</span> / <span id="kpi-labs-active">0</span></div>
+              <div class="kpi-meta">
+                <span class="badge badge-success">Online</span>
+                <span>Silent (&gt;15m): <strong id="kpi-labs-silent" class="mono">0</strong> Lab</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-label">TOTAL INVENTARIS TERDATA</div>
+              <div id="kpi-inv-items" class="kpi-value mono">0</div>
+              <div class="kpi-meta">
+                <span>Total Unit: <strong id="kpi-inv-units" class="mono">0</strong></span>
+                <span class="badge badge-success">Baik: <span id="kpi-inv-good" class="mono">0</span></span>
+                <span class="badge badge-warning">Rusak/Perbaikan: <span id="kpi-inv-issue" class="mono">0</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Matriks Kesehatan Sinkronisasi per Lab -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Kesehatan Sinkronisasi Kiosk per Laboratorium</h2>
+                <p class="panel-subtitle">Status pengiriman batch terakhir, sisa antrean lokal (backlog), dan deteksi selisih waktu (clock skew)</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" data-goto-view="labs">Kelola Lab & Token</button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID Lab (`lab_id`)</th>
+                    <th>Nama Laboratorium</th>
+                    <th>Status Kiosk</th>
+                    <th class="num">Scan Hari Ini</th>
+                    <th class="num">Total Scan</th>
+                    <th class="num">Antrean Lokal (`pending`)</th>
+                    <th class="num">Selisih Jam</th>
+                    <th>Terakhir Diterima Pusat</th>
+                    <th class="actions-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-labs-tbody">
+                  <tr><td colspan="9" class="empty-cell">Memuat status laboratorium...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Grid Grafik Tren 7 Hari & Jam Sibuk -->
+          <div class="charts-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Tren Kunjungan 7 Hari Terakhir</h2>
+                  <p class="panel-subtitle">Perbandingan scan mahasiswa terdaftar (OK) dan NIM tidak dikenal</p>
+                </div>
+              </div>
+              <div id="chart-daily-trend" class="chart-box"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Distribusi Jam Kunjungan Hari Ini (00:00 – 23:00 WIB)</h2>
+                  <p class="panel-subtitle">Pola jam sibuk penggunaan laboratorium berdasarkan `scanned_at`</p>
+                </div>
+              </div>
+              <div id="chart-hourly-trend" class="chart-box"></div>
+            </div>
+          </div>
+
+          <!-- Live Feed 50 Scan Terakhir -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Aktivitas Kunjungan Terbaru (Live Feed)</h2>
+                <p class="panel-subtitle">50 catatan scan terakhir yang diterima dari seluruh PC Kiosk. Klik baris untuk melihat rincian & riwayat mahasiswa.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" data-goto-view="visits">Buka Tabel Lengkap</button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table table-interactive">
+                <thead>
+                  <tr>
+                    <th>Waktu Scan (Kiosk)</th>
+                    <th>Laboratorium</th>
+                    <th>NIM</th>
+                    <th>Nama Mahasiswa</th>
+                    <th>Kelas / Sem</th>
+                    <th>Status Scan</th>
+                    <th>Diterima Pusat</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-livefeed-tbody">
+                  <tr><td colspan="7" class="empty-cell">Belum ada data kunjungan.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 2: DATA KUNJUNGAN ==================== -->
+        <section id="view-visits" class="view-section hidden">
+          <div class="toolbar-panel">
+            <form id="visits-filter-form" class="toolbar-group toolbar-wrap">
+              <div class="field-inline">
+                <label for="visits-q">Cari NIM / Nama</label>
+                <input type="text" id="visits-q" placeholder="Ketik NIM atau nama..." />
+              </div>
+              <div class="field-inline">
+                <label for="visits-lab">Laboratorium</label>
+                <select id="visits-lab">
+                  <option value="">Semua Lab</option>
+                </select>
+              </div>
+              <div class="field-inline">
+                <label for="visits-status">Status Scan</label>
+                <select id="visits-status">
+                  <option value="">Semua Status</option>
+                  <option value="ok">Terdaftar (OK)</option>
+                  <option value="not_found">Tidak Dikenal (Not Found)</option>
+                </select>
+              </div>
+              <div class="field-inline">
+                <label for="visits-from">Dari Tanggal</label>
+                <input type="date" id="visits-from" />
+              </div>
+              <div class="field-inline">
+                <label for="visits-to">Sampai Tanggal</label>
+                <input type="date" id="visits-to" />
+              </div>
+              <div class="field-inline">
+                <label for="visits-kelas">Kelas</label>
+                <input type="text" id="visits-kelas" placeholder="Mis: A" style="width: 68px;" />
+              </div>
+              <div class="field-inline">
+                <label for="visits-semester">Semester</label>
+                <input type="number" id="visits-semester" min="1" max="14" placeholder="All" style="width: 72px;" />
+              </div>
+              <div class="toolbar-buttons">
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                <button type="button" id="visits-reset-btn" class="btn btn-secondary btn-sm">Reset</button>
+              </div>
+            </form>
+
+            <div class="toolbar-actions">
+              <button type="button" id="visits-export-xlsx" class="btn btn-secondary btn-sm">Ekspor .XLSX</button>
+              <button type="button" id="visits-export-csv" class="btn btn-secondary btn-sm">Ekspor .CSV</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Log Kunjungan Laboratorium</h2>
+                <p id="visits-summary-text" class="panel-subtitle">Menampilkan data kunjungan yang telah tersinkronisasi ke database pusat</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table table-interactive">
+                <thead>
+                  <tr>
+                    <th>Waktu Kunjungan (`scanned_at`)</th>
+                    <th>NIM</th>
+                    <th>Nama Mahasiswa</th>
+                    <th>Kelas / Sem</th>
+                    <th>Laboratorium (`lab_id`)</th>
+                    <th>Status Scan</th>
+                    <th>Diterima Pusat (`received_at`)</th>
+                    <th class="actions-col">Rincian</th>
+                  </tr>
+                </thead>
+                <tbody id="visits-tbody">
+                  <tr><td colspan="8" class="empty-cell">Memuat data kunjungan...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination-bar">
+              <div id="visits-page-info" class="pagination-info mono">Halaman 1 dari 1</div>
+              <div class="pagination-controls">
+                <button type="button" id="visits-prev-page" class="btn btn-secondary btn-sm" disabled>Sebelumnya</button>
+                <button type="button" id="visits-next-page" class="btn btn-secondary btn-sm" disabled>Berikutnya</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 3: LABORATORIUM & TOKEN ==================== -->
+        <section id="view-labs" class="view-section hidden">
+          <div class="toolbar-panel">
+            <div>
+              <h2 class="section-inline-title">Daftar Laboratorium & Kredensial Kiosk</h2>
+              <p class="section-inline-desc">Setiap instalasi PC Kiosk (`Lab Scan KTM`) wajib menggunakan `lab_id` terdaftar dan token Bearer unik.</p>
+            </div>
+            <div class="toolbar-actions">
+              <button type="button" id="btn-open-new-lab" class="btn btn-primary btn-sm">+ Tambah Laboratorium Baru</button>
+            </div>
+          </div>
+
+          <!-- Box Token Baru (Tampil Sekali Saat Lab Dibuat / Token Dirotasi) -->
+          <div id="token-reveal-panel" class="token-reveal-panel hidden">
+            <div class="token-reveal-header">
+              <div>
+                <span class="badge badge-warning">TAMPIL SATU KALI</span>
+                <h3 id="token-reveal-title">Kredensial Token Baru Laboratorium</h3>
+                <p>Salin token atau konfigurasi `.env` di bawah ini sekarang dan tempelkan ke file `.env` pada PC Kiosk laboratorium terkait. Token mentah tidak disimpan di database dan tidak dapat dilihat kembali setelah panel ini ditutup.</p>
+              </div>
+              <button type="button" id="btn-close-token-reveal" class="btn btn-secondary btn-sm">Tutup Panel</button>
+            </div>
+            <div class="token-reveal-grid">
+              <div class="token-box">
+                <div class="token-box-label">BEARER TOKEN INTEGRASI (`MONITOR_TOKEN`)</div>
+                <div class="token-copy-row">
+                  <code id="token-reveal-value" class="mono">lab_...</code>
+                  <button type="button" id="btn-copy-token" class="btn btn-secondary btn-sm">Salin Token</button>
+                </div>
+              </div>
+              <div class="token-box">
+                <div class="token-box-label">POTONGAN `.env` SIAP PAKAI UNTUK PC KIOSK (`traffic_tracker`)</div>
+                <pre id="token-reveal-env" class="mono token-env-pre"></pre>
+                <button type="button" id="btn-copy-env" class="btn btn-primary btn-sm">Salin Konfigurasi `.env` Kiosk</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Kode `lab_id`</th>
+                    <th>Nama Tampilan Lab</th>
+                    <th>Lokasi / Keterangan</th>
+                    <th>Status Lab</th>
+                    <th>Kesehatan Kiosk</th>
+                    <th>Token Aktif (Hint)</th>
+                    <th class="num">Total Kunjungan</th>
+                    <th class="num">Item Inventaris</th>
+                    <th>Sinkronisasi Terakhir</th>
+                    <th class="actions-col">Tindakan</th>
+                  </tr>
+                </thead>
+                <tbody id="labs-tbody">
+                  <tr><td colspan="10" class="empty-cell">Memuat daftar laboratorium...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 4: INVENTARIS BARANG ==================== -->
+        <section id="view-inventory" class="view-section hidden">
+          <!-- Ringkasan Kondisi Inventaris -->
+          <div class="kpi-grid kpi-grid-compact">
+            <div class="kpi-card kpi-card-sm">
+              <div class="kpi-label">TOTAL ITEM AKTIF</div>
+              <div id="inv-stat-total" class="kpi-value-sm mono">0</div>
+            </div>
+            <div class="kpi-card kpi-card-sm">
+              <div class="kpi-label">KONDISI BAIK</div>
+              <div id="inv-stat-baik" class="kpi-value-sm mono text-success">0</div>
+            </div>
+            <div class="kpi-card kpi-card-sm">
+              <div class="kpi-label">RUSAK RINGAN / PERBAIKAN</div>
+              <div id="inv-stat-ringan" class="kpi-value-sm mono text-warning">0</div>
+            </div>
+            <div class="kpi-card kpi-card-sm">
+              <div class="kpi-label">RUSAK BERAT</div>
+              <div id="inv-stat-berat" class="kpi-value-sm mono text-danger">0</div>
+            </div>
+          </div>
+
+          <div class="toolbar-panel">
+            <form id="inv-filter-form" class="toolbar-group toolbar-wrap">
+              <div class="field-inline">
+                <label for="inv-q">Cari Kode / Nama</label>
+                <input type="text" id="inv-q" placeholder="INV-... atau nama alat" />
+              </div>
+              <div class="field-inline">
+                <label for="inv-lab">Laboratorium</label>
+                <select id="inv-lab">
+                  <option value="">Semua Lab</option>
+                </select>
+              </div>
+              <div class="field-inline">
+                <label for="inv-category">Kategori</label>
+                <select id="inv-category">
+                  <option value="">Semua Kategori</option>
+                </select>
+              </div>
+              <div class="field-inline">
+                <label for="inv-condition">Kondisi</label>
+                <select id="inv-condition">
+                  <option value="">Semua Kondisi</option>
+                  <option value="Baik">Baik</option>
+                  <option value="Rusak Ringan">Rusak Ringan</option>
+                  <option value="Rusak Berat">Rusak Berat</option>
+                  <option value="Dalam Perbaikan">Dalam Perbaikan</option>
+                </select>
+              </div>
+              <div class="field-inline">
+                <label for="inv-status">Status</label>
+                <select id="inv-status">
+                  <option value="">Aktif & Tidak Aktif</option>
+                  <option value="Aktif">Aktif</option>
+                  <option value="Tidak Aktif">Tidak Aktif</option>
+                  <option value="Arsip">Arsip</option>
+                </select>
+              </div>
+              <div class="toolbar-buttons">
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                <button type="button" id="inv-reset-btn" class="btn btn-secondary btn-sm">Reset</button>
+              </div>
+            </form>
+
+            <div class="toolbar-actions">
+              <button type="button" id="inv-export-xlsx" class="btn btn-secondary btn-sm">Ekspor .XLSX</button>
+              <button type="button" class="btn btn-secondary btn-sm" data-goto-view="import-audit">Impor dari Excel</button>
+              <button type="button" id="btn-open-new-inv" class="btn btn-primary btn-sm">+ Tambah Barang</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Daftar Inventaris Peralatan Laboratorium</h2>
+                <p id="inv-summary-text" class="panel-subtitle">Pencatatan kode barang, kuantitas, kondisi fisik, dan penempatan laboratorium</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Kode Inventaris</th>
+                    <th>Nama Barang</th>
+                    <th>Kategori</th>
+                    <th>Laboratorium</th>
+                    <th class="num">Jumlah</th>
+                    <th>Satuan</th>
+                    <th>Kondisi</th>
+                    <th>Status</th>
+                    <th>Catatan</th>
+                    <th>Diperbarui</th>
+                    <th class="actions-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="inv-tbody">
+                  <tr><td colspan="11" class="empty-cell">Memuat data inventaris...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination-bar">
+              <div id="inv-page-info" class="pagination-info mono">Halaman 1 dari 1</div>
+              <div class="pagination-controls">
+                <button type="button" id="inv-prev-page" class="btn btn-secondary btn-sm" disabled>Sebelumnya</button>
+                <button type="button" id="inv-next-page" class="btn btn-secondary btn-sm" disabled>Berikutnya</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 5: IMPOR EXCEL & AUDIT ==================== -->
+        <section id="view-import-audit" class="view-section hidden">
+          <!-- Panel Impor Excel 2-Tahap -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Impor Massal Inventaris via Excel (Alur Tervalidasi 2-Tahap)</h2>
+                <p class="panel-subtitle">Sistem membaca dan memvalidasi seluruh baris terlebih dahulu. Data tidak akan disimpan sebelum Anda memeriksa pratinjau dan menekan konfirmasi.</p>
+              </div>
+              <a href="/api/inventory/template" class="btn btn-secondary btn-sm" download>
+                Unduh Template Resmi (.XLSX)
+              </a>
+            </div>
+
+            <div class="import-workflow-grid">
+              <div class="import-step-card">
+                <div class="step-badge">TAHAP 1</div>
+                <h3>Pilih & Validasi File Excel</h3>
+                <p>Pastikan kolom mengikuti template resmi (`kode_inventaris`, `nama_barang`, `kategori`, `lab_id`, `jumlah`, `satuan`, `kondisi`, `status`, `catatan`).</p>
+                <form id="excel-preview-form" class="import-upload-form">
+                  <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" required />
+                  <button type="submit" id="btn-run-preview" class="btn btn-primary btn-sm">
+                    Validasi & Tampilkan Pratinjau
+                  </button>
+                </form>
+              </div>
+
+              <div id="import-confirm-card" class="import-step-card import-step-disabled">
+                <div class="step-badge">TAHAP 2</div>
+                <h3>Pilih Kebijakan Konflik & Konfirmasi</h3>
+                <p>Tentukan perlakuan jika `kode_inventaris` di dalam Excel sudah ada di database pusat:</p>
+                <div class="field-group">
+                  <label for="import-conflict-mode">Kebijakan untuk Kode Inventaris yang Sudah Ada</label>
+                  <select id="import-conflict-mode">
+                    <option value="insert_only">Tambah Saja (Simpan baris baru, lewati kode yang sudah ada)</option>
+                    <option value="upsert">Perbarui Data (Tambah baris baru & perbarui item dengan kode yang sama)</option>
+                  </select>
+                </div>
+                <div class="import-confirm-actions">
+                  <button type="button" id="btn-confirm-import" class="btn btn-primary btn-sm" disabled>
+                    Konfirmasi & Simpan ke Database
+                  </button>
+                  <button type="button" id="btn-cancel-preview" class="btn btn-secondary btn-sm" disabled>
+                    Batalkan Pratinjau
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Area Hasil Pratinjau per Baris -->
+            <div id="import-preview-results" class="import-preview-results hidden">
+              <div class="preview-summary-bar">
+                <span class="badge badge-neutral">File: <strong id="prev-file-name" class="mono">-</strong></span>
+                <span class="badge badge-neutral">Total Baris: <strong id="prev-total-rows" class="mono">0</strong></span>
+                <span class="badge badge-success">Baru Valid: <strong id="prev-new-rows" class="mono">0</strong></span>
+                <span class="badge badge-warning">Konflik Kode Existing: <strong id="prev-conflict-rows" class="mono">0</strong></span>
+                <span class="badge badge-danger">Baris Gagal (Error): <strong id="prev-failed-rows" class="mono">0</strong></span>
+              </div>
+
+              <div class="table-responsive" style="max-height: 360px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th class="num">Baris Excel</th>
+                      <th>Status Validasi</th>
+                      <th>Kode Inventaris</th>
+                      <th>Nama Barang</th>
+                      <th>Kategori</th>
+                      <th>`lab_id`</th>
+                      <th class="num">Jumlah</th>
+                      <th>Kondisi / Status</th>
+                      <th>Keterangan Validasi / Alasan Gagal</th>
+                    </tr>
+                  </thead>
+                  <tbody id="import-preview-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid Riwayat Batch Ingest & Log Audit Keamanan -->
+          <div class="charts-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Riwayat Batch Sinkronisasi Kiosk (`ingest_batches`)</h2>
+                  <p class="panel-subtitle">50 transaksi pengiriman terakhir dari PC laboratorium</p>
+                </div>
+              </div>
+              <div class="table-responsive" style="max-height: 380px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Waktu Diterima</th>
+                      <th>`lab_id`</th>
+                      <th class="num">Total</th>
+                      <th class="num">Accepted</th>
+                      <th class="num">Duplikat</th>
+                      <th class="num">Pending</th>
+                      <th class="num">Skew</th>
+                    </tr>
+                  </thead>
+                  <tbody id="audit-batches-tbody">
+                    <tr><td colspan="7" class="empty-cell">Belum ada riwayat batch.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h2 class="panel-title">Jejak Audit Aktivitas & Keamanan (`audit_log`)</h2>
+                  <p class="panel-subtitle">Pencatatan login, rotasi token, perubahan inventaris, dan ekspor/impor</p>
+                </div>
+              </div>
+              <div class="table-responsive" style="max-height: 380px;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Waktu</th>
+                      <th>Aktor</th>
+                      <th>Aksi</th>
+                      <th>Target</th>
+                      <th>Rincian</th>
+                    </tr>
+                  </thead>
+                  <tbody id="audit-logs-tbody">
+                    <tr><td colspan="5" class="empty-cell">Memuat log audit...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER DRAWER: DETAIL KUNJUNGAN & RIWAYAT MAHASISWA -->
+  <div id="visit-drawer-backdrop" class="drawer-backdrop hidden">
+    <aside class="drawer-panel">
+      <div class="drawer-header">
+        <div>
+          <div class="drawer-kicker">INSPEKSI CATATAN KUNJUNGAN</div>
+          <h2 id="drawer-title" class="drawer-title mono">Detail Scan KTM</h2>
+        </div>
+        <button type="button" id="btn-close-drawer" class="btn btn-secondary btn-sm">Tutup</button>
+      </div>
+      <div id="drawer-body" class="drawer-body"></div>
+    </aside>
+  </div>
+
+  <!-- MODAL: TAMBAH / EDIT LABORATORIUM -->
+  <div id="modal-lab" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-lab-title">Tambah Laboratorium Baru</h3>
+        <button type="button" class="btn-icon" data-close-modal="modal-lab">&times;</button>
+      </div>
+      <form id="form-lab" class="modal-body">
+        <input type="hidden" id="lab-form-mode" value="create" />
+        <div class="field-group">
+          <label for="lab-input-id">Kode Identitas Unik (`lab_id`)</label>
+          <input type="text" id="lab-input-id" class="mono" required pattern="[a-zA-Z0-9][a-zA-Z0-9_-]{1,63}" placeholder="contoh: lab-jaringan-1" />
+          <small class="field-hint">Harus sama persis dengan variabel `LAB_ID` pada file `.env` PC Kiosk. Gunakan huruf kecil, angka, dan tanda hubung (`-`).</small>
+        </div>
+        <div class="field-group">
+          <label for="lab-input-name">Nama Tampilan Laboratorium</label>
+          <input type="text" id="lab-input-name" required placeholder="contoh: LAB JARINGAN KOMPUTER 1" />
+        </div>
+        <div class="field-group">
+          <label for="lab-input-location">Lokasi / Gedung / Ruangan</label>
+          <input type="text" id="lab-input-location" placeholder="contoh: Gedung Sains Lt. 2 R.204" />
+        </div>
+        <div class="field-group">
+          <label for="lab-input-desc">Keterangan Tambahan</label>
+          <textarea id="lab-input-desc" rows="2" placeholder="Keterangan perangkat kiosk atau penanggung jawab..."></textarea>
+        </div>
+        <div id="lab-active-group" class="field-group hidden">
+          <label class="checkbox-label">
+            <input type="checkbox" id="lab-input-active" checked />
+            <span>Laboratorium Aktif (diizinkan mengirim data scan ke pusat)</span>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-lab">Batal</button>
+          <button type="submit" id="btn-save-lab" class="btn btn-primary">Simpan Laboratorium</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH / EDIT INVENTARIS MANUAL -->
+  <div id="modal-inv" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-inv-title">Tambah Item Inventaris</h3>
+        <button type="button" class="btn-icon" data-close-modal="modal-inv">&times;</button>
+      </div>
+      <form id="form-inv" class="modal-body">
+        <input type="hidden" id="inv-form-id" value="" />
+        <div class="form-row-2">
+          <div class="field-group">
+            <label for="inv-input-code">Kode Inventaris (Unik)</label>
+            <input type="text" id="inv-input-code" class="mono" required placeholder="INV-JAR-001" />
+          </div>
+          <div class="field-group">
+            <label for="inv-input-lab">Laboratorium Penempatan</label>
+            <select id="inv-input-lab" required></select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="inv-input-name">Nama Barang / Peralatan</label>
+          <input type="text" id="inv-input-name" required placeholder="contoh: Router Mikrotik RB4011iGS+RM" />
+        </div>
+
+        <div class="form-row-3">
+          <div class="field-group">
+            <label for="inv-input-category">Kategori</label>
+            <input type="text" id="inv-input-category" required placeholder="Perangkat Jaringan" />
+          </div>
+          <div class="field-group">
+            <label for="inv-input-qty">Jumlah</label>
+            <input type="number" id="inv-input-qty" class="mono" min="0" step="1" required value="1" />
+          </div>
+          <div class="field-group">
+            <label for="inv-input-unit">Satuan</label>
+            <input type="text" id="inv-input-unit" required placeholder="unit / buah / set" value="unit" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="field-group">
+            <label for="inv-input-condition">Kondisi Fisik</label>
+            <select id="inv-input-condition" required>
+              <option value="Baik">Baik</option>
+              <option value="Rusak Ringan">Rusak Ringan</option>
+              <option value="Rusak Berat">Rusak Berat</option>
+              <option value="Dalam Perbaikan">Dalam Perbaikan</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="inv-input-status">Status Inventaris</label>
+            <select id="inv-input-status" required>
+              <option value="Aktif">Aktif</option>
+              <option value="Tidak Aktif">Tidak Aktif</option>
+              <option value="Arsip">Arsip</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="inv-input-notes">Catatan / Lokasi Rak / Nomor Seri</label>
+          <textarea id="inv-input-notes" rows="2" placeholder="Catatan opsional..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-inv">Batal</button>
+          <button type="submit" id="btn-save-inv" class="btn btn-primary">Simpan Inventaris</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

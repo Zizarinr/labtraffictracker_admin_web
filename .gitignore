@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Database & runtime data
+data/
+backups/
+logs/
+*.db
+*.db-wal
+*.db-shm
+*.db.old
+*.log
+*.log.old
+
+# Local design documents (per DESIGN.md instructions: do not commit)
+central-monitoring/
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
