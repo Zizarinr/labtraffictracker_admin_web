@@ -1330,17 +1330,61 @@ function createApp(db) {
     res.json({ audit_logs: logs, ingest_batches: batches });
   });
 
-  // ---------------- STATIC FRONTEND ----------------
+  // ---------------- ROUTE HALAMAN PORTAL LOGIN & KONSOL DASHBOARD ----------------
   const publicDir = path.join(config.rootDir, 'public');
-  app.use(express.static(publicDir));
+  const ADMIN_PAGE_ROUTES = ['/dashboard', '/visits', '/laboratories', '/inventory', '/import-audit'];
 
-  // Fallback SPA untuk route non-API
-  app.use((req, res, next) => {
+  // Root '/' mengarahkan ke /dashboard jika sudah login, atau /login jika belum
+  app.get('/', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const session = getSessionFromRequest(db, req);
+    if (session) {
+      res.redirect(302, '/dashboard');
+      return;
+    }
+    res.redirect(302, '/login');
+  });
+
+  // Portal Login (/login): jika sudah login, langsung arahkan ke /dashboard
+  app.get('/login', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const session = getSessionFromRequest(db, req);
+    if (session) {
+      const nextParam = String(req.query.next || '');
+      const target = ADMIN_PAGE_ROUTES.includes(nextParam) ? nextParam : '/dashboard';
+      res.redirect(302, target);
+      return;
+    }
+    res.sendFile(path.join(publicDir, 'login.html'));
+  });
+
+  // Halaman Konsol Admin Terproteksi Server
+  app.get(ADMIN_PAGE_ROUTES, (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const session = getSessionFromRequest(db, req);
+    if (!session) {
+      res.redirect(302, `/login?next=${encodeURIComponent(req.path)}`);
+      return;
+    }
+    res.sendFile(path.join(publicDir, 'dashboard.html'));
+  });
+
+  // Cegah akses langsung ke file template HTML mentah
+  app.get(['/login.html', '/dashboard.html', '/index.html'], (req, res) => {
+    res.redirect(302, '/');
+  });
+
+  // Asset statis (CSS, JS) tanpa auto-index
+  app.use(express.static(publicDir, { index: false }));
+
+  // Fallback untuk route yang tidak dikenal
+  app.use((req, res, _next) => {
     if (req.path.startsWith('/api/')) {
       res.status(404).json({ error: 'not_found', message: 'Endpoint API tidak ditemukan.' });
       return;
     }
-    res.sendFile(path.join(publicDir, 'index.html'));
+    const session = getSessionFromRequest(db, req);
+    res.redirect(302, session ? '/dashboard' : '/login');
   });
 
   // Error handler global

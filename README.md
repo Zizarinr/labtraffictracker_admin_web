@@ -32,6 +32,14 @@ npm run seed
 npm start
 ```
 
+### Struktur Endpoint Halaman Web (Server-Guarded)
+- `GET /login` — Portal autentikasi khusus Administrator (`public/login.html`). Jika sudah login, otomatis diarahkan ke `/dashboard`.
+- `GET /dashboard` — Konsol Ringkasan Operasional, Status Kiosk Lab, Grafik Tren, & Live Feed.
+- `GET /visits` — Eksplorasi Data Kunjungan KTM, Filter, Detail Kunjungan, Riwayat Lintas Lab, & Ekspor.
+- `GET /laboratories` — Manajemen Laboratorium, Pendaftaran `lab_id`, & Rotasi Bearer Token.
+- `GET /inventory` — Manajemen Inventaris Barang per Laboratorium.
+- `GET /import-audit` — Impor Massal Excel 2-Tahap (Preview → Confirm), Riwayat Batch Kiosk, & Audit Log.
+
 Kredensial Administrator bawaan (dapat diubah melalui `.env`):
 - **Email:** `admin@lab.kampus.ac.id`
 - **Password:** `AdminLab!2026`

@@ -70,15 +70,26 @@ test('1. Healthcheck endpoint mengembalikan status OK dan zona waktu Asia/Jakart
   assert.equal(r.body.timezone, 'Asia/Jakarta');
 });
 
-test('2. Autentikasi Admin & proteksi CSRF berfungsi dengan benar', async () => {
-  // Login salah harus 401
+test('2. Autentikasi Admin, Pemisahan Portal /login vs /dashboard, & proteksi CSRF berfungsi dengan benar', async () => {
+  // 2a. Sebelum login: akses /dashboard harus 302 redirect ke /login?next=%2Fdashboard
+  const unauthDash = await fetch(`${baseUrl}/dashboard`, { redirect: 'manual' });
+  assert.equal(unauthDash.status, 302);
+  assert.equal(unauthDash.headers.get('location'), '/login?next=%2Fdashboard');
+
+  // 2b. Sebelum login: akses /login harus 200 OK menampilkan portal login
+  const loginPage = await fetch(`${baseUrl}/login`, { redirect: 'manual' });
+  assert.equal(loginPage.status, 200);
+  const loginHtml = await loginPage.text();
+  assert.ok(loginHtml.includes('PORTAL AUTENTIKASI PUSAT'));
+
+  // 2c. Login salah harus 401
   const bad = await request('/api/auth/login', {
     method: 'POST',
     body: { email: config.adminEmail, password: 'wrong-password' },
   });
   assert.equal(bad.status, 401);
 
-  // Login benar
+  // 2d. Login benar
   const ok = await request('/api/auth/login', {
     method: 'POST',
     body: { email: config.adminEmail, password: config.adminPassword },
@@ -89,7 +100,28 @@ test('2. Autentikasi Admin & proteksi CSRF berfungsi dengan benar', async () => 
   csrfToken = ok.body.csrf_token;
   assert.ok(csrfToken);
 
-  // Cek /api/auth/me
+  // 2e. Setelah login: akses /login harus otomatis 302 redirect ke /dashboard
+  const authLogin = await fetch(`${baseUrl}/login`, {
+    headers: { Cookie: adminCookie },
+    redirect: 'manual',
+  });
+  assert.equal(authLogin.status, 302);
+  assert.equal(authLogin.headers.get('location'), '/dashboard');
+
+  // 2f. Setelah login: akses /dashboard dan /inventory harus 200 OK menyajikan konsol admin
+  const authDash = await fetch(`${baseUrl}/dashboard`, {
+    headers: { Cookie: adminCookie },
+    redirect: 'manual',
+  });
+  assert.equal(authDash.status, 200);
+
+  const authInv = await fetch(`${baseUrl}/inventory`, {
+    headers: { Cookie: adminCookie },
+    redirect: 'manual',
+  });
+  assert.equal(authInv.status, 200);
+
+  // 2g. Cek /api/auth/me
   const me = await request('/api/auth/me');
   assert.equal(me.status, 200);
   assert.equal(me.body.authenticated, true);

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masuk Administrator — Sistem Pusat Laboratorium</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="login-screen">
+    <div class="login-container">
+      <div class="login-brand">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-kicker">PORTAL AUTENTIKASI PUSAT</div>
+          <h1 class="brand-title">Monitoring Kunjungan & Inventaris Lab</h1>
+        </div>
+      </div>
+
+      <form id="login-form" class="login-card" autocomplete="on">
+        <div class="login-card-header">
+          <h2>Masuk Administrator</h2>
+          <p>Gunakan akun pengelola laboratorium untuk mengakses konsol monitoring dan inventaris.</p>
+        </div>
+
+        <div id="login-error" class="alert-banner alert-danger hidden"></div>
+
+        <div class="field-group">
+          <label for="login-email">Alamat Email</label>
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            required
+            autofocus
+            placeholder="admin@lab.kampus.ac.id"
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="login-password">Kata Sandi</label>
+          <input
+            id="login-password"
+            name="password"
+            type="password"
+            required
+            placeholder="••••••••••••"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" id="login-submit" class="btn btn-primary btn-block">
+          Masuk ke Konsol Pusat
+        </button>
+
+        <div class="login-footer-meta">
+          <span>Endpoint Kiosk: <code>POST /api/lab/traffic</code></span>
+          <span>Zona Waktu: <code>Asia/Jakarta (+07:00)</code></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/login.js"></script>
+</body>
+</html>

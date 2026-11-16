@@ -3,60 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistem Pusat Monitoring & Inventaris Laboratorium</title>
+  <title>Konsol Pusat — Monitoring & Inventaris Laboratorium</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <!-- LAYAR LOGIN -->
-  <div id="login-screen" class="login-screen hidden">
-    <div class="login-container">
-      <div class="login-brand">
-        <div class="brand-mark">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-          </svg>
-        </div>
-        <div>
-          <div class="brand-kicker">SISTEM PUSAT LABORATORIUM</div>
-          <h1 class="brand-title">Monitoring Kunjungan & Inventaris</h1>
-        </div>
-      </div>
-
-      <form id="login-form" class="login-card" autocomplete="on">
-        <div class="login-card-header">
-          <h2>Masuk Administrator</h2>
-          <p>Gunakan kredensial pengelola laboratorium untuk mengakses konsol pusat.</p>
-        </div>
-
-        <div id="login-error" class="alert-banner alert-danger hidden"></div>
-
-        <div class="field-group">
-          <label for="login-email">Alamat Email</label>
-          <input id="login-email" name="email" type="email" required placeholder="admin@lab.kampus.ac.id" autocomplete="username" />
-        </div>
-
-        <div class="field-group">
-          <label for="login-password">Kata Sandi</label>
-          <input id="login-password" name="password" type="password" required placeholder="••••••••••••" autocomplete="current-password" />
-        </div>
-
-        <button type="submit" id="login-submit" class="btn btn-primary btn-block">
-          Masuk ke Konsol Pusat
-        </button>
-
-        <div class="login-footer-meta">
-          <span>Kontrak Ingest: <code>POST /api/lab/traffic</code></span>
-          <span>Zona Waktu: <code>Asia/Jakarta (+07:00)</code></span>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- SHELL APLIKASI UTAMA -->
-  <div id="app-shell" class="app-shell hidden">
+  <!-- SHELL APLIKASI UTAMA (HANYA DIAKSES SETELAH AUTENTIKASI SERVER) -->
+  <div id="app-shell" class="app-shell">
     <!-- SIDEBAR NAVIGASI -->
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -76,7 +28,7 @@
 
       <div class="sidebar-section-label">OPERASIONAL KUNJUNGAN</div>
       <nav class="sidebar-nav">
-        <button type="button" class="nav-item active" data-view="dashboard">
+        <button type="button" class="nav-item active" data-view="dashboard" data-path="/dashboard">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
             <rect x="3" y="3" width="7" height="9" rx="1"></rect>
             <rect x="14" y="3" width="7" height="5" rx="1"></rect>
@@ -86,7 +38,7 @@
           <span>Ringkasan & Status Lab</span>
         </button>
 
-        <button type="button" class="nav-item" data-view="visits">
+        <button type="button" class="nav-item" data-view="visits" data-path="/visits">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
             <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
             <rect x="9" y="3" width="6" height="4" rx="1"></rect>
@@ -96,7 +48,7 @@
           <span>Data Kunjungan KTM</span>
         </button>
 
-        <button type="button" class="nav-item" data-view="labs">
+        <button type="button" class="nav-item" data-view="labs" data-path="/laboratories">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
             <rect x="2" y="3" width="20" height="14" rx="2"></rect>
             <path d="M8 21h8"></path>
@@ -108,7 +60,7 @@
 
       <div class="sidebar-section-label">MANAJEMEN ASET</div>
       <nav class="sidebar-nav">
-        <button type="button" class="nav-item" data-view="inventory">
+        <button type="button" class="nav-item" data-view="inventory" data-path="/inventory">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
             <path d="m3.3 7 8.7 5 8.7-5"></path>
@@ -117,7 +69,7 @@
           <span>Inventaris Barang</span>
         </button>
 
-        <button type="button" class="nav-item" data-view="import-audit">
+        <button type="button" class="nav-item" data-view="import-audit" data-path="/import-audit">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
@@ -138,7 +90,7 @@
             <div id="current-user-name" class="user-name">Administrator</div>
             <div id="current-user-email" class="user-email">admin@lab.kampus.ac.id</div>
           </div>
-          <button type="button" id="logout-btn" class="btn-icon" title="Keluar Sesi">
+          <button type="button" id="logout-btn" class="btn-icon" title="Keluar Sesi (Logout)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
@@ -180,7 +132,6 @@
       <main class="content-body">
         <!-- ==================== VIEW 1: DASHBOARD ==================== -->
         <section id="view-dashboard" class="view-section">
-          <!-- Filter Bar Dashboard -->
           <div class="toolbar-panel">
             <div class="toolbar-group">
               <div class="field-inline">
@@ -205,10 +156,8 @@
             </div>
           </div>
 
-          <!-- Peringatan Operasional Aktif -->
           <div id="dash-alerts-container" class="alerts-stack hidden"></div>
 
-          <!-- 4 Kartu Metrik Utama -->
           <div class="kpi-grid">
             <div class="kpi-card">
               <div class="kpi-label">KUNJUNGAN HARI INI (<span id="kpi-today-date" class="mono">-</span>)</div>
@@ -248,7 +197,6 @@
             </div>
           </div>
 
-          <!-- Matriks Kesehatan Sinkronisasi per Lab -->
           <div class="panel">
             <div class="panel-header">
               <div>
@@ -279,7 +227,6 @@
             </div>
           </div>
 
-          <!-- Grid Grafik Tren 7 Hari & Jam Sibuk -->
           <div class="charts-grid">
             <div class="panel">
               <div class="panel-header">
@@ -302,7 +249,6 @@
             </div>
           </div>
 
-          <!-- Live Feed 50 Scan Terakhir -->
           <div class="panel">
             <div class="panel-header">
               <div>
@@ -430,7 +376,6 @@
             </div>
           </div>
 
-          <!-- Box Token Baru (Tampil Sekali Saat Lab Dibuat / Token Dirotasi) -->
           <div id="token-reveal-panel" class="token-reveal-panel hidden">
             <div class="token-reveal-header">
               <div>
@@ -483,7 +428,6 @@
 
         <!-- ==================== VIEW 4: INVENTARIS BARANG ==================== -->
         <section id="view-inventory" class="view-section hidden">
-          <!-- Ringkasan Kondisi Inventaris -->
           <div class="kpi-grid kpi-grid-compact">
             <div class="kpi-card kpi-card-sm">
               <div class="kpi-label">TOTAL ITEM AKTIF</div>
@@ -594,7 +538,6 @@
 
         <!-- ==================== VIEW 5: IMPOR EXCEL & AUDIT ==================== -->
         <section id="view-import-audit" class="view-section hidden">
-          <!-- Panel Impor Excel 2-Tahap -->
           <div class="panel">
             <div class="panel-header">
               <div>
@@ -641,7 +584,6 @@
               </div>
             </div>
 
-            <!-- Area Hasil Pratinjau per Baris -->
             <div id="import-preview-results" class="import-preview-results hidden">
               <div class="preview-summary-bar">
                 <span class="badge badge-neutral">File: <strong id="prev-file-name" class="mono">-</strong></span>
@@ -672,7 +614,6 @@
             </div>
           </div>
 
-          <!-- Grid Riwayat Batch Ingest & Log Audit Keamanan -->
           <div class="charts-grid">
             <div class="panel">
               <div class="panel-header">

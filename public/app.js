@@ -17,26 +17,39 @@
 
   const VIEW_META = {
     dashboard: {
+      path: '/dashboard',
       title: 'Ringkasan Operasional & Status Lab',
       subtitle: 'Pemantauan penerimaan log multi-laboratorium, antrean lokal kiosk, dan aset',
     },
     visits: {
+      path: '/visits',
       title: 'Data Kunjungan Mahasiswa (Lab Scan KTM)',
       subtitle: 'Penelusuran, pemfilteran, inspeksi detail scan, dan ekspor log kunjungan',
     },
     labs: {
+      path: '/laboratories',
       title: 'Manajemen Laboratorium & Token Integrasi',
       subtitle: 'Pendaftaran identitas lab_id, rotasi Bearer token, dan konfigurasi PC Kiosk',
     },
     inventory: {
+      path: '/inventory',
       title: 'Inventaris Peralatan Laboratorium',
       subtitle: 'Pengelolaan data barang, kondisi fisik, dan penempatan per laboratorium',
     },
     'import-audit': {
+      path: '/import-audit',
       title: 'Impor Massal Excel & Audit Operasional',
       subtitle: 'Validasi pratinjau impor inventaris 2-tahap, riwayat batch kiosk, dan log keamanan',
     },
   };
+
+  function viewFromPathname(pathname) {
+    const clean = String(pathname || '').replace(/\/+$/, '') || '/dashboard';
+    for (const [viewKey, meta] of Object.entries(VIEW_META)) {
+      if (meta.path === clean) return viewKey;
+    }
+    return 'dashboard';
+  }
 
   /* ---------------- UTILITAS ---------------- */
   function $(id) {
@@ -101,7 +114,7 @@
     }
 
     if (res.status === 401 && url !== '/api/auth/login' && url !== '/api/auth/me') {
-      showLoginScreen();
+      redirectToLogin();
       throw new Error('Sesi berakhir, silakan masuk kembali.');
     }
 
@@ -152,15 +165,12 @@
   }
 
   /* ---------------- AUTH & NAVIGATION ---------------- */
-  function showLoginScreen() {
-    state.authenticated = false;
-    $('app-shell').classList.add('hidden');
-    $('login-screen').classList.remove('hidden');
+  function redirectToLogin() {
+    const nextPath = VIEW_META[state.currentView]?.path || '/dashboard';
+    window.location.replace(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
-  function showAppShell() {
-    $('login-screen').classList.add('hidden');
-    $('app-shell').classList.remove('hidden');
+  function hydrateUserShell() {
     if (state.user) {
       $('current-user-name').textContent = state.user.name || 'Administrator';
       $('current-user-email').textContent = state.user.email || '';
@@ -178,14 +188,15 @@
         state.user = me.user;
         state.csrfToken = me.csrf_token || '';
         state.system = me.system || {};
-        showAppShell();
+        hydrateUserShell();
+        const initialView = viewFromPathname(window.location.pathname);
         await loadLabsOptions();
-        await switchView(state.currentView);
+        await switchView(initialView, { replaceHistory: true });
       } else {
-        showLoginScreen();
+        redirectToLogin();
       }
     } catch {
-      showLoginScreen();
+      redirectToLogin();
     }
   }
 
@@ -224,9 +235,17 @@
     }
   }
 
-  async function switchView(viewName) {
+  async function switchView(viewName, options = {}) {
     if (!VIEW_META[viewName]) viewName = 'dashboard';
     state.currentView = viewName;
+
+    const targetPath = VIEW_META[viewName].path;
+    if (options.replaceHistory) {
+      window.history.replaceState({ view: viewName }, '', targetPath);
+    } else if (options.pushHistory !== false && window.location.pathname !== targetPath) {
+      window.history.pushState({ view: viewName }, '', targetPath);
+    }
+    document.title = `${VIEW_META[viewName].title} — Sistem Pusat Lab`;
 
     document.querySelectorAll('.nav-item').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.view === viewName);
@@ -904,40 +923,20 @@
 
   /* ---------------- EVENT LISTENERS ---------------- */
   function bindEvents() {
-    // Login form
-    $('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const errBox = $('login-error');
-      errBox.classList.add('hidden');
-      const btn = $('login-submit');
-      btn.disabled = true;
-
-      try {
-        const email = $('login-email').value.trim();
-        const password = $('login-password').value;
-        await apiFetch('/api/auth/login', {
-          method: 'POST',
-          body: { email, password },
-        });
-        $('login-password').value = '';
-        await checkSession();
-        showToast('Berhasil masuk ke konsol pusat.', 'success');
-      } catch (err) {
-        errBox.textContent = err.message;
-        errBox.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-      }
+    // Sinkronisasi tombol Back/Forward browser
+    window.addEventListener('popstate', () => {
+      const targetView = viewFromPathname(window.location.pathname);
+      switchView(targetView, { pushHistory: false });
     });
 
-    // Logout
+    // Logout -> hapus sesi & arahkan ke /login
     $('logout-btn').addEventListener('click', async () => {
       try {
         await apiFetch('/api/auth/logout', { method: 'POST' });
       } catch {
         /* ignore */
       }
-      showLoginScreen();
+      window.location.replace('/login');
     });
 
     // Sidebar navigation
@@ -956,7 +955,7 @@
 
     // Refresh current view
     $('refresh-current-view').addEventListener('click', () => {
-      switchView(state.currentView);
+      switchView(state.currentView, { pushHistory: false });
     });
 
     // Dashboard filter
