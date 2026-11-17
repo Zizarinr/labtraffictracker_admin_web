@@ -196,6 +196,49 @@
     if (state.system && state.system.ingest_url) {
       $('sidebar-ingest-url').textContent = state.system.ingest_url;
     }
+    if (state.system && state.system.version && $('footer-version-text')) {
+      $('footer-version-text').textContent = `v${state.system.version}`;
+    }
+  }
+
+  async function openChangelogModal() {
+    try {
+      $('modal-changelog').classList.remove('hidden');
+      const data = await apiFetch('/api/version');
+      const releases = data.releases || [];
+      if (releases.length === 0) {
+        $('changelog-modal-body').innerHTML = '<div class="empty-cell">Belum ada data catatan rilis.</div>';
+        return;
+      }
+
+      $('changelog-modal-body').innerHTML = releases
+        .map(
+          (rel, idx) => `
+          <div class="release-card">
+            <div class="release-header">
+              <div class="release-title-group">
+                <span class="badge ${idx === 0 ? 'badge-success' : 'badge-neutral'} mono">v${esc(rel.version)}</span>
+                ${idx === 0 ? '<span class="badge badge-neutral">Rilis Aktif</span>' : ''}
+                <strong>${esc(rel.title)}</strong>
+              </div>
+              <span class="mono text-muted" style="font-size:12px;">${esc(rel.date)}</span>
+            </div>
+            <p class="release-summary">${esc(rel.summary || '')}</p>
+            <div class="release-section-title">Pembaruan untuk Pengguna:</div>
+            <ul class="release-list">
+              ${(rel.user_changes || []).map((c) => `<li>${esc(c)}</li>`).join('')}
+            </ul>
+            <div class="release-section-title">Catatan Arsip Pengembang (Developer Notes):</div>
+            <ul class="release-list release-list-dev mono">
+              ${(rel.dev_notes || []).map((n) => `<li>${esc(n)}</li>`).join('')}
+            </ul>
+          </div>
+        `
+        )
+        .join('');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
   }
 
   async function checkSession() {
@@ -985,6 +1028,14 @@
     $('refresh-current-view').addEventListener('click', () => {
       switchView(state.currentView, { pushHistory: false });
     });
+
+    // Buka modal Changelog / Riwayat Versi dari Footer
+    const changelogBtn = $('btn-open-changelog');
+    if (changelogBtn) {
+      changelogBtn.addEventListener('click', () => {
+        openChangelogModal();
+      });
+    }
 
     // Dashboard filter
     $('dash-apply-filter').addEventListener('click', () => {

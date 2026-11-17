@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Konsol Pusat — Monitoring & Inventaris Laboratorium TI UNIDA</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script>
     (function () {
       try {
@@ -84,26 +85,6 @@
       </nav>
 
       <div class="sidebar-footer">
-        <!-- LOGO PELENGKAP (PRODI TI & UNIDA) -->
-        <div class="sidebar-companion-box">
-          <div class="sidebar-companion-logos">
-            <span class="sidebar-companion-pill" title="Universitas Darussalam Gontor">
-              <img src="/img/logo-unida.png" alt="UNIDA" />
-              <span>UNIDA</span>
-            </span>
-            <span class="sidebar-companion-pill" title="Program Studi Teknik Informatika">
-              <img src="/img/logo-prodi-ti.png" alt="Prodi TI" />
-              <span>Prodi TI</span>
-            </span>
-          </div>
-          <div class="sidebar-kiosk-note">
-            Monitoring Web untuk Kiosk:
-            <a href="https://github.com/Zizarinr/lab_traffic_tracker.git" target="_blank" rel="noopener noreferrer" class="sidebar-kiosk-link">
-              Lab Traffic Tracker ↗
-            </a>
-          </div>
-        </div>
-
         <div class="ingest-endpoint-box">
           <div class="ingest-endpoint-label">ENDPOINT SINKRONISASI KIOSK</div>
           <code id="sidebar-ingest-url" class="ingest-endpoint-code">/api/lab/traffic</code>
@@ -709,6 +690,27 @@
           </div>
         </section>
       </main>
+
+      <!-- FOOTER RESMI APLIKASI (CREDIT, PASANGAN KIOSK, & VERSI) -->
+      <footer class="app-footer">
+        <div class="app-footer-left">
+          <span>&copy; 2026 <strong>Laboratorium Teknik Informatika</strong> &mdash; Universitas Darussalam Gontor.</span>
+          <span class="footer-sep">&bull;</span>
+          <span>
+            Web Monitoring Pusat untuk Kiosk
+            <a href="https://github.com/Zizarinr/lab_traffic_tracker.git" target="_blank" rel="noopener noreferrer">
+              Lab Traffic Tracker ↗
+            </a>
+          </span>
+        </div>
+        <div class="app-footer-right">
+          <button type="button" id="btn-open-changelog" class="version-pill mono" title="Klik untuk melihat Catatan Rilis & Riwayat Pembaruan">
+            <span class="status-dot status-dot-online"></span>
+            <span id="footer-version-text">v1.1.0</span>
+            <span>&mdash; Info Pembaruan</span>
+          </button>
+        </div>
+      </footer>
     </div>
   </div>
 
@@ -836,6 +838,27 @@
           <button type="submit" id="btn-save-inv" class="btn btn-primary">Simpan Inventaris</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CATATAN RILIS & RIWAYAT VERSI (CHANGELOG) -->
+  <div id="modal-changelog" class="modal-backdrop hidden">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div>
+          <h3 style="margin:0;">Catatan Rilis & Riwayat Versi Aplikasi</h3>
+          <div class="text-muted" style="font-size:11.5px; margin-top:2px;">
+            Dokumentasi pembaruan untuk pengguna operasional & arsip teknis pengembang
+          </div>
+        </div>
+        <button type="button" class="btn-icon" data-close-modal="modal-changelog">&times;</button>
+      </div>
+      <div id="changelog-modal-body" class="modal-body changelog-modal-body">
+        <div class="empty-cell">Memuat riwayat versi...</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal="modal-changelog">Tutup</button>
+      </div>
     </div>
   </div>
 

@@ -17,6 +17,7 @@ const {
 } = require('./auth');
 const { recordAudit } = require('./audit');
 const { createIngestHandler, LAB_ID_REGEX } = require('./ingest');
+const { CURRENT_VERSION, RELEASES } = require('./version');
 const {
   buildInventoryTemplateBuffer,
   createInventoryImportPreview,
@@ -86,19 +87,26 @@ function createApp(db) {
   const ingest = createIngestHandler(db);
   const requireAdmin = createAuthMiddleware(db);
 
-  // ---------------- HEALTHCHECK ----------------
+  // ---------------- HEALTHCHECK & VERSION ----------------
   function healthResponse(req, res) {
     const dbOk = db.prepare('SELECT 1 AS ok').get()?.ok === 1;
     res.status(dbOk ? 200 : 500).json({
       ok: dbOk,
       service: 'lab_admin_monitor',
-      version: '1.0.0',
+      version: CURRENT_VERSION,
       timezone: config.timezone,
       now: nowIso(),
     });
   }
   app.get('/healthz', healthResponse);
   app.get('/api/health', healthResponse);
+
+  app.get('/api/version', (req, res) => {
+    res.json({
+      version: CURRENT_VERSION,
+      releases: RELEASES,
+    });
+  });
 
   // ---------------- INGEST API (KIOSK -> PUSAT) ----------------
   app.post('/api/lab/traffic', ingest.handler);
@@ -183,6 +191,7 @@ function createApp(db) {
       user: session.user,
       csrf_token: session.csrfToken,
       system: {
+        version: CURRENT_VERSION,
         base_url: config.baseUrl,
         ingest_url: `${config.baseUrl.replace(/\/+$/, '')}/api/lab/traffic`,
         timezone: config.timezone,
@@ -1374,7 +1383,13 @@ function createApp(db) {
     res.redirect(302, '/');
   });
 
-  // Asset statis (CSS, JS) tanpa auto-index
+  // Favicon handler
+  app.get('/favicon.ico', (req, res) => {
+    res.type('image/svg+xml');
+    res.sendFile(path.join(publicDir, 'favicon.svg'));
+  });
+
+  // Asset statis (CSS, JS, SVG, IMG) tanpa auto-index
   app.use(express.static(publicDir, { index: false }));
 
   // Fallback untuk route yang tidak dikenal

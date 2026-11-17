@@ -1,6 +1,6 @@
 {
   "name": "labtraffictracker_admin_web",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Website Utama Sistem Monitoring Kunjungan Multi-Lab & Manajemen Inventaris Laboratorium (terintegrasi dengan Lab Scan KTM).",
   "main": "server.js",
   "type": "commonjs",

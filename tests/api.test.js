@@ -63,11 +63,22 @@ after(async () => {
   fs.rmSync(TMP_DIR, { recursive: true, force: true });
 });
 
-test('1. Healthcheck endpoint mengembalikan status OK dan zona waktu Asia/Jakarta', async () => {
+test('1. Healthcheck, Favicon, & Version API mengembalikan status OK, versi aktif, dan zona waktu Asia/Jakarta', async () => {
   const r = await request('/healthz');
   assert.equal(r.status, 200);
   assert.equal(r.body.ok, true);
   assert.equal(r.body.timezone, 'Asia/Jakarta');
+  assert.equal(r.body.version, '1.1.0');
+
+  const ver = await request('/api/version');
+  assert.equal(ver.status, 200);
+  assert.equal(ver.body.version, '1.1.0');
+  assert.ok(Array.isArray(ver.body.releases) && ver.body.releases.length >= 3);
+
+  const favSvg = await fetch(`${baseUrl}/favicon.svg`);
+  assert.equal(favSvg.status, 200);
+  const favIco = await fetch(`${baseUrl}/favicon.ico`);
+  assert.equal(favIco.status, 200);
 });
 
 test('2. Autentikasi Admin, Pemisahan Portal /login vs /dashboard, & proteksi CSRF berfungsi dengan benar', async () => {
@@ -119,12 +130,17 @@ test('2. Autentikasi Admin, Pemisahan Portal /login vs /dashboard, & proteksi CS
   assert.equal(authLogin.status, 302);
   assert.equal(authLogin.headers.get('location'), '/dashboard');
 
-  // 2f. Setelah login: akses /dashboard dan /inventory harus 200 OK menyajikan konsol admin
+  // 2f. Setelah login: akses /dashboard dan /inventory harus 200 OK menyajikan konsol admin (tanpa logo prodi/unida, dengan footer versi)
   const authDash = await fetch(`${baseUrl}/dashboard`, {
     headers: { Cookie: adminCookie },
     redirect: 'manual',
   });
   assert.equal(authDash.status, 200);
+  const dashHtml = await authDash.text();
+  assert.ok(!dashHtml.includes('/img/logo-unida.png'));
+  assert.ok(!dashHtml.includes('/img/logo-prodi-ti.png'));
+  assert.ok(dashHtml.includes('app-footer'));
+  assert.ok(dashHtml.includes('btn-open-changelog'));
 
   const authInv = await fetch(`${baseUrl}/inventory`, {
     headers: { Cookie: adminCookie },
