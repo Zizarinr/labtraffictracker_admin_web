@@ -6,6 +6,37 @@
   const passwordInput = document.getElementById('login-password');
   const errorBox = document.getElementById('login-error');
   const submitBtn = document.getElementById('login-submit');
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  const themeLabel = document.getElementById('theme-toggle-label');
+  const sunIcon = document.getElementById('theme-icon-sun');
+  const moonIcon = document.getElementById('theme-icon-moon');
+
+  function applyTheme(theme) {
+    const clean = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', clean);
+    try {
+      localStorage.setItem('lab_central_theme', clean);
+    } catch {
+      /* ignore */
+    }
+    if (themeLabel) {
+      themeLabel.textContent = clean === 'dark' ? 'Mode Terang' : 'Mode Gelap';
+    }
+    if (sunIcon && moonIcon) {
+      sunIcon.classList.toggle('hidden', clean !== 'dark');
+      moonIcon.classList.toggle('hidden', clean === 'dark');
+    }
+  }
+
+  // Inisialisasi status tombol tema
+  applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
+
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  }
 
   function resolveNextPath() {
     const params = new URLSearchParams(window.location.search);

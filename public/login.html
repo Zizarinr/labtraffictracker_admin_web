@@ -1,71 +1,141 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Masuk Administrator — Sistem Pusat Laboratorium</title>
+  <title>Masuk Administrator — Sistem Pusat Monitoring & Inventaris Lab TI UNIDA</title>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('lab_central_theme');
+        if (saved === 'dark' || saved === 'light') {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="login-screen">
+  <div class="login-screen login-with-bg">
+    <!-- LAYER BACKGROUND GAMBAR LAB DENGAN EFEK TRANSPARANSI -->
+    <div class="login-bg-image" role="presentation"></div>
+    <div class="login-bg-overlay" role="presentation"></div>
+
+    <!-- TOPBAR FLOATING DI HALAMAN LOGIN (LINK REPO KIOSK + THEME TOGGLE) -->
+    <div class="login-topbar">
+      <a
+        href="https://github.com/Zizarinr/lab_traffic_tracker.git"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="login-repo-pill"
+        title="Buka Repositori Aplikasi Sumber: Lab Scan KTM (Traffic Tracker)"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+          <path d="M9 18c-4.51 2-5-2-7-2"></path>
+        </svg>
+        <span>Aplikasi Sumber Kiosk: <strong>Lab Traffic Tracker</strong></span>
+      </a>
+
+      <button type="button" id="theme-toggle-btn" class="btn btn-secondary btn-sm theme-toggle-btn" title="Ganti Tema Tampilan (Terang / Gelap)">
+        <svg id="theme-icon-sun" class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="theme-icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span id="theme-toggle-label">Mode Gelap</span>
+      </button>
+    </div>
+
     <div class="login-container">
-      <div class="login-brand">
-        <div class="brand-mark">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-          </svg>
+      <!-- KARTU UTAMA PORTAL LOGIN (DENGAN EFEK TRANSPARANSI) -->
+      <div class="login-card login-card-glass">
+        <!-- HEADER IDENTITAS UTAMA: LOGO LAB SEBAGAI LOGO UTAMA -->
+        <div class="login-hero-brand">
+          <div class="primary-lab-logo-frame">
+            <img src="/img/logo-aslab.png" alt="Logo Laboratory Informatic Engineering" class="primary-lab-logo-img" />
+          </div>
+          <div class="login-hero-text">
+            <div class="brand-kicker">WEB MONITORING & INVENTARIS PUSAT</div>
+            <h1 class="brand-title">Laboratorium Teknik Informatika</h1>
+            <p class="brand-desc">
+              Sistem pusat penerima sinkronisasi kunjungan multi-lab dari aplikasi kiosk
+              <a href="https://github.com/Zizarinr/lab_traffic_tracker.git" target="_blank" rel="noopener noreferrer">Lab Traffic Tracker</a>
+              serta pengelolaan inventaris laboratorium.
+            </p>
+          </div>
         </div>
-        <div>
-          <div class="brand-kicker">PORTAL AUTENTIKASI PUSAT</div>
-          <h1 class="brand-title">Monitoring Kunjungan & Inventaris Lab</h1>
+
+        <form id="login-form" class="login-form-inner" autocomplete="on">
+          <div class="login-card-header">
+            <h2>Masuk Administrator</h2>
+            <p>Masukkan kredensial pengelola laboratorium untuk membuka konsol pusat.</p>
+          </div>
+
+          <div id="login-error" class="alert-banner alert-danger hidden"></div>
+
+          <div class="field-group">
+            <label for="login-email">Alamat Email</label>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              required
+              autofocus
+              placeholder="admin@lab.kampus.ac.id"
+              autocomplete="username"
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="login-password">Kata Sandi</label>
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              required
+              placeholder="••••••••••••"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <button type="submit" id="login-submit" class="btn btn-primary btn-block">
+            Masuk ke Konsol Pusat
+          </button>
+        </form>
+
+        <!-- FOOTER LOGO PELENGKAP (PRODI TI & UNIDA) + INFO KONTRAK -->
+        <div class="login-companion-footer">
+          <div class="companion-logos-row">
+            <div class="companion-label">DIDUKUNG OLEH:</div>
+            <div class="companion-badges">
+              <div class="companion-logo-pill" title="Universitas Darussalam Gontor">
+                <img src="/img/logo-unida.png" alt="Logo UNIDA Gontor" class="companion-logo-img" />
+                <span>UNIDA Gontor</span>
+              </div>
+              <div class="companion-logo-pill" title="Program Studi Teknik Informatika">
+                <img src="/img/logo-prodi-ti.png" alt="Logo Prodi Teknik Informatika" class="companion-logo-img" />
+                <span>Prodi Teknik Informatika</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="login-footer-meta">
+            <span>Ingest API: <code class="mono">POST /api/lab/traffic</code></span>
+            <span>Sumber Kiosk: <a href="https://github.com/Zizarinr/lab_traffic_tracker.git" target="_blank" rel="noopener noreferrer" class="mono">Zizarinr/lab_traffic_tracker</a></span>
+          </div>
         </div>
       </div>
-
-      <form id="login-form" class="login-card" autocomplete="on">
-        <div class="login-card-header">
-          <h2>Masuk Administrator</h2>
-          <p>Gunakan akun pengelola laboratorium untuk mengakses konsol monitoring dan inventaris.</p>
-        </div>
-
-        <div id="login-error" class="alert-banner alert-danger hidden"></div>
-
-        <div class="field-group">
-          <label for="login-email">Alamat Email</label>
-          <input
-            id="login-email"
-            name="email"
-            type="email"
-            required
-            autofocus
-            placeholder="admin@lab.kampus.ac.id"
-            autocomplete="username"
-          />
-        </div>
-
-        <div class="field-group">
-          <label for="login-password">Kata Sandi</label>
-          <input
-            id="login-password"
-            name="password"
-            type="password"
-            required
-            placeholder="••••••••••••"
-            autocomplete="current-password"
-          />
-        </div>
-
-        <button type="submit" id="login-submit" class="btn btn-primary btn-block">
-          Masuk ke Konsol Pusat
-        </button>
-
-        <div class="login-footer-meta">
-          <span>Endpoint Kiosk: <code>POST /api/lab/traffic</code></span>
-          <span>Zona Waktu: <code>Asia/Jakarta (+07:00)</code></span>
-        </div>
-      </form>
     </div>
   </div>
 

@@ -1,9 +1,19 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Konsol Pusat — Monitoring & Inventaris Laboratorium</title>
+  <title>Konsol Pusat — Monitoring & Inventaris Laboratorium TI UNIDA</title>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('lab_central_theme');
+        if (saved === 'dark' || saved === 'light') {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -11,18 +21,11 @@
   <div id="app-shell" class="app-shell">
     <!-- SIDEBAR NAVIGASI -->
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="brand-mark brand-mark-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-          </svg>
-        </div>
+      <div class="sidebar-header sidebar-header-logo">
+        <img src="/img/logo-aslab.png" alt="Logo Lab Teknik Informatika" class="sidebar-main-logo" />
         <div class="sidebar-brand-text">
           <div class="sidebar-title">LAB CENTRAL</div>
-          <div class="sidebar-subtitle">Monitoring & Inventaris</div>
+          <div class="sidebar-subtitle">Monitoring & Inventaris Web</div>
         </div>
       </div>
 
@@ -81,6 +84,26 @@
       </nav>
 
       <div class="sidebar-footer">
+        <!-- LOGO PELENGKAP (PRODI TI & UNIDA) -->
+        <div class="sidebar-companion-box">
+          <div class="sidebar-companion-logos">
+            <span class="sidebar-companion-pill" title="Universitas Darussalam Gontor">
+              <img src="/img/logo-unida.png" alt="UNIDA" />
+              <span>UNIDA</span>
+            </span>
+            <span class="sidebar-companion-pill" title="Program Studi Teknik Informatika">
+              <img src="/img/logo-prodi-ti.png" alt="Prodi TI" />
+              <span>Prodi TI</span>
+            </span>
+          </div>
+          <div class="sidebar-kiosk-note">
+            Monitoring Web untuk Kiosk:
+            <a href="https://github.com/Zizarinr/lab_traffic_tracker.git" target="_blank" rel="noopener noreferrer" class="sidebar-kiosk-link">
+              Lab Traffic Tracker ↗
+            </a>
+          </div>
+        </div>
+
         <div class="ingest-endpoint-box">
           <div class="ingest-endpoint-label">ENDPOINT SINKRONISASI KIOSK</div>
           <code id="sidebar-ingest-url" class="ingest-endpoint-code">/api/lab/traffic</code>
@@ -114,6 +137,23 @@
             <span class="status-dot status-dot-online"></span>
             <span id="server-clock-text" class="mono">WIB (+07:00)</span>
           </div>
+          <button type="button" id="theme-toggle-btn" class="btn btn-secondary btn-sm theme-toggle-btn" title="Ganti Tema Tampilan (Terang / Gelap)">
+            <svg id="theme-icon-sun" class="hidden" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg id="theme-icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <span id="theme-toggle-label">Mode Gelap</span>
+          </button>
           <button type="button" id="refresh-current-view" class="btn btn-secondary btn-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="23 4 23 10 17 10"></polyline>

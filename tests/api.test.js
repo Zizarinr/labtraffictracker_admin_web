@@ -76,11 +76,22 @@ test('2. Autentikasi Admin, Pemisahan Portal /login vs /dashboard, & proteksi CS
   assert.equal(unauthDash.status, 302);
   assert.equal(unauthDash.headers.get('location'), '/login?next=%2Fdashboard');
 
-  // 2b. Sebelum login: akses /login harus 200 OK menampilkan portal login
+  // 2b. Sebelum login: akses /login harus 200 OK menampilkan portal login beserta logo, link repo kiosk, dan theme toggle
   const loginPage = await fetch(`${baseUrl}/login`, { redirect: 'manual' });
   assert.equal(loginPage.status, 200);
   const loginHtml = await loginPage.text();
-  assert.ok(loginHtml.includes('PORTAL AUTENTIKASI PUSAT'));
+  assert.ok(loginHtml.includes('WEB MONITORING & INVENTARIS PUSAT'));
+  assert.ok(loginHtml.includes('/img/logo-aslab.png'));
+  assert.ok(loginHtml.includes('/img/logo-prodi-ti.png'));
+  assert.ok(loginHtml.includes('/img/logo-unida.png'));
+  assert.ok(loginHtml.includes('https://github.com/Zizarinr/lab_traffic_tracker.git'));
+  assert.ok(loginHtml.includes('theme-toggle-btn'));
+
+  // Pastikan aset gambar background & logo utama terlayani dengan status 200
+  const bgImgRes = await fetch(`${baseUrl}/img/lab-lantai-3.jpeg`);
+  assert.equal(bgImgRes.status, 200);
+  const logoImgRes = await fetch(`${baseUrl}/img/logo-aslab.png`);
+  assert.equal(logoImgRes.status, 200);
 
   // 2c. Login salah harus 401
   const bad = await request('/api/auth/login', {

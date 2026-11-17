@@ -165,6 +165,24 @@
   }
 
   /* ---------------- AUTH & NAVIGATION ---------------- */
+  function applyTheme(theme) {
+    const clean = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', clean);
+    try {
+      localStorage.setItem('lab_central_theme', clean);
+    } catch {
+      /* ignore */
+    }
+    const label = $('theme-toggle-label');
+    const sun = $('theme-icon-sun');
+    const moon = $('theme-icon-moon');
+    if (label) label.textContent = clean === 'dark' ? 'Mode Terang' : 'Mode Gelap';
+    if (sun && moon) {
+      sun.classList.toggle('hidden', clean !== 'dark');
+      moon.classList.toggle('hidden', clean === 'dark');
+    }
+  }
+
   function redirectToLogin() {
     const nextPath = VIEW_META[state.currentView]?.path || '/dashboard';
     window.location.replace(`/login?next=${encodeURIComponent(nextPath)}`);
@@ -923,6 +941,16 @@
 
   /* ---------------- EVENT LISTENERS ---------------- */
   function bindEvents() {
+    // Inisialisasi & event listener Theme Toggle
+    applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
+    const themeBtn = $('theme-toggle-btn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme') || 'light';
+        applyTheme(cur === 'dark' ? 'light' : 'dark');
+      });
+    }
+
     // Sinkronisasi tombol Back/Forward browser
     window.addEventListener('popstate', () => {
       const targetView = viewFromPathname(window.location.pathname);
